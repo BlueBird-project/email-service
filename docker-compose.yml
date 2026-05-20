@@ -1,9 +1,9 @@
 services:
-  karno-fm-email-poc:
+  bluebird-fm-email-poc:
     build: .
-    container_name: karno-fm-email-poc
+    container_name: bluebird-fm-email-poc
     ports:
-      - "3000:3000"
+      - "3050:3000"
     env_file:
       - .env
     volumes:

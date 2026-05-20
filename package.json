@@ -1,7 +1,7 @@
 {
-  "name": "karno-fm-email-poc",
+  "name": "bluebird-fm-email-poc",
   "version": "0.1.0",
-  "description": "PoC to simulate FM output reception for Karno and notify by email",
+  "description": "PoC to simulate FM output reception for BlueBird and notify by email",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -9,7 +9,7 @@
   },
   "keywords": [
     "bluebird",
-    "karno",
+    "bluebird",
     "fm",
     "email",
     "poc"

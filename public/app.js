@@ -106,7 +106,7 @@ function buildPayload() {
   const testRecipient = document.getElementById('test-email').value.trim();
 
   return {
-    pilot_id: 'karno',
+    pilot_id: 'bluebird',
     message_id: crypto.randomUUID(),
     timestamp_utc: new Date().toISOString(),
     severity: document.getElementById('severity').value,

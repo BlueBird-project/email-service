@@ -3,10 +3,10 @@ const { config } = require('./config');
 const logger = require('./logger');
 
 function buildEmailContent(payload) {
-  const subject = `[BlueBird-Karno][${payload.severity.toUpperCase()}] Simulated FM output - ${payload.title}`;
+  const subject = `[BlueBird][${payload.severity.toUpperCase()}] Simulated FM output - ${payload.title}`;
 
   const lines = [
-    'Context: Karno pilot (BlueBird) - Simulated output from the Flexibility Manager.',
+    'Context: BlueBird pilot - Simulated output from the Flexibility Manager.',
     '',
     `Message ID: ${payload.message_id}`,
     `Timestamp (UTC): ${payload.timestamp_utc}`,

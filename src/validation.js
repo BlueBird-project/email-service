@@ -8,7 +8,7 @@ const recommendationTypes = [
 ];
 
 const fmOutputSchema = z.object({
-  pilot_id: z.literal('karno'),
+  pilot_id: z.literal('bluebird'),
   message_id: z.string().min(1),
   timestamp_utc: z.string().datetime({ offset: true }),
   severity: z.enum(['info', 'warning', 'critical']),
