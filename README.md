@@ -37,7 +37,7 @@ npm install
 npm start
 ```
 
-The app runs on `http://localhost:3000` by default.
+The app runs on `http://127.0.0.1:3050` by default.
 
 ## Docker setup
 
@@ -60,7 +60,7 @@ docker compose down
 
 ## Demo dashboard
 
-Open `http://127.0.0.1:3050` in a browser (or `http://localhost:3000` if running locally without Docker).
+Open `http://127.0.0.1:3050` in a browser.
 
 The dashboard allows you to:
 
@@ -94,13 +94,7 @@ Sample payload is available in `sample-payload.json`.
 Example:
 
 ```bash
-# Docker (port 3050)
 curl -X POST http://127.0.0.1:3050/fm-output \
-  -H "Content-Type: application/json" \
-  --data @sample-payload.json
-
-# Local (port 3000)
-curl -X POST http://localhost:3000/fm-output \
   -H "Content-Type: application/json" \
   --data @sample-payload.json
 ```
