@@ -1,0 +1,17 @@
+{
+  "pilot_id": "karno",
+  "message_id": "f8d2860f-87d8-447f-a274-e36a4e35f3da",
+  "timestamp_utc": "2026-05-20T10:30:00Z",
+  "severity": "warning",
+  "fm_recommendation_type": "charge_storage",
+  "title": "Increase thermal storage charge",
+  "description": "Charge thermal storage between 11:00 and 13:00 due to expected electricity price increase later in the day.",
+  "valid_from_utc": "2026-05-20T11:00:00Z",
+  "valid_to_utc": "2026-05-20T13:00:00Z",
+  "constraints_summary": "Maintain resident comfort setpoints and do not exceed max network flow.",
+  "requested_by": "FM-simulator",
+  "metadata": {
+    "asset_group": "thermal_network_zone_A",
+    "estimated_flex_kwh": 42.5
+  }
+}

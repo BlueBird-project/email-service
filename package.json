@@ -1,0 +1,25 @@
+{
+  "name": "karno-fm-email-poc",
+  "version": "0.1.0",
+  "description": "PoC to simulate FM output reception for Karno and notify by email",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "bluebird",
+    "karno",
+    "fm",
+    "email",
+    "poc"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.14",
+    "zod": "^3.23.8"
+  }
+}
