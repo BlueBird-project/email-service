@@ -60,20 +60,6 @@ The dashboard allows you to:
 - View API responses.
 - Display recent events from logs.
 
-## Temporary inbox demo flow (for Edu)
-
-1. Open the dashboard and click `Check status`.
-2. Confirm `Email mode` is `Real SMTP`.
-3. Confirm `SMTP readiness` is `Ready`.
-4. Open any temporary inbox provider and copy a disposable email address.
-5. Paste that address in `Test recipient email (optional)`.
-6. Click `Send simulation`.
-7. Confirm the API response shows:
-  - `"sent": true`
-  - `"to": "<temporary-email>"`
-8. Refresh the temporary inbox page and show the received recommendation email.
-
-If `SMTP readiness` is `Not ready`, update `.env` with real SMTP values and restart the app.
 
 ## API endpoints
 
