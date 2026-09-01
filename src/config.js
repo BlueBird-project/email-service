@@ -58,6 +58,4 @@ const smtpReadiness = getSmtpReadiness(config.smtp);
 config.smtpReady = smtpReadiness.ready;
 config.smtpIssues = smtpReadiness.issues;
 
-module.exports = {
-  config
-};
+module.exports = { config };

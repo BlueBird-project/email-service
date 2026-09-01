@@ -1,122 +1,361 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlueBird Karno Demo</title>
+    <title>Karno FM · BlueBird</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
 
-    <main class="layout">
-    <br> <br>
-      <section class="grid">
-        <article class="card status-card">
-          <h2>Service status</h2>
-          <p class="muted">Check availability and email mode.</p>
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect y="3" width="20" height="2" rx="1" fill="currentColor"/><rect y="9" width="20" height="2" rx="1" fill="currentColor"/><rect y="15" width="20" height="2" rx="1" fill="currentColor"/></svg>
+    </button>
+
+    <div class="app-shell">
+
+      <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
+      <nav id="sidebar" class="sidebar" aria-label="Main navigation">
+        <div class="sidebar-brand">
+          <span class="brand-pill">BlueBird</span>
+          <span class="brand-name">Karno FM</span>
+        </div>
+
+        <ul class="nav-list" role="list">
+          <li>
+            <button class="nav-item active" id="nav-overview" data-section="overview">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+              Overview
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" id="nav-send" data-section="send">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 2.5L7 9M13.5 2.5L9 14l-2-5-5-2 11.5-4.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Send
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" id="nav-recipients" data-section="recipients">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Recipients
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" id="nav-templates" data-section="templates">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 5.5h7M4.5 8h7M4.5 10.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Email templates
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" id="nav-history" data-section="history">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Send history
+            </button>
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <span class="sf-label">Service</span>
           <div id="health-pill" class="pill">Not checked</div>
-          <dl class="status-list">
-            <div><dt>Environment</dt><dd id="env-value">-</dd></div>
-            <div><dt>Email mode</dt><dd id="dry-value">-</dd></div>
-            <div><dt>SMTP readiness</dt><dd id="smtp-value">-</dd></div>
-            <div><dt>Last check</dt><dd id="health-time">-</dd></div>
-          </dl>
-          <p id="smtp-hint" class="hint">-</p>
-          <button id="check-health" class="btn btn-secondary">Check status</button>
-        </article>
+        </div>
+      </nav>
 
-        <article class="card form-card">
-          <h2>Send simulated FM recommendation</h2>
-          <p class="muted">Fill in key fields and run the test.</p>
+      <!-- ── Main content ──────────────────────────────────────────────────── -->
+      <div class="main">
 
-          <form id="fm-form">
-            <div class="form-row">
-              <label for="severity">Severity</label>
-              <select id="severity" name="severity">
-                <option value="info">Info</option>
-                <option value="warning" selected>Warning</option>
-                <option value="critical">Critical</option>
-              </select>
+        <!-- ── 1. Overview ──────────────────────────────────────────────────── -->
+        <section id="section-overview" class="section">
+          <header class="section-header">
+            <div>
+              <h1>Overview</h1>
+              <p class="section-sub">Operational summary for the Karno FM notification service.</p>
             </div>
+            <button id="ov-send-btn" class="btn btn-primary">Send notification</button>
+          </header>
 
-            <div class="form-row">
-              <label for="type">Recommendation type</label>
-              <select id="type" name="type">
-                <option value="setpoint_adjustment">Setpoint adjustment</option>
-                <option value="charge_storage" selected>Charge storage</option>
-                <option value="load_shift">Load shift</option>
-                <option value="other">Other</option>
-              </select>
+          <div class="stats-row">
+            <div class="stat-card">
+              <span class="stat-label">SMTP</span>
+              <span id="ov-smtp" class="stat-value">—</span>
             </div>
-
-            <div class="form-row">
-              <label for="title">Title</label>
-              <input id="title" name="title" maxlength="140" value="Increase thermal storage charge" />
+            <div class="stat-card">
+              <span class="stat-label">Email mode</span>
+              <span id="ov-mode" class="stat-value">—</span>
             </div>
-
-            <div class="form-row">
-              <label for="description">Description</label>
-              <textarea id="description" name="description" rows="3">Charge thermal storage due to expected price increase later in the day.</textarea>
+            <div class="stat-card">
+              <span class="stat-label">Recipients</span>
+              <span id="ov-recipient-count" class="stat-value">—</span>
             </div>
+            <div class="stat-card">
+              <span class="stat-label">Templates</span>
+              <span id="ov-template-count" class="stat-value">—</span>
+            </div>
+          </div>
 
-            <div class="form-two-col">
-              <div class="form-row">
-                <label for="from">From (UTC)</label>
-                <input id="from" name="from" type="datetime-local" />
-              </div>
-              <div class="form-row">
-                <label for="to">To (UTC)</label>
-                <input id="to" name="to" type="datetime-local" />
+          <div class="ov-grid">
+            <div class="panel">
+              <h2>Recent sends</h2>
+              <div id="ov-history-list">
+                <p class="empty-state">No sends recorded yet.</p>
               </div>
             </div>
 
-            <div class="form-row">
-              <label for="constraints">Constraints</label>
-              <textarea id="constraints" name="constraints" rows="2">Maintain comfort and max network flow limits.</textarea>
-            </div>
-
-            <div class="form-row">
-              <label for="test-email">Test recipient email (optional)</label>
-              <input id="test-email" name="test-email" type="email" placeholder="pilot-demo@example.com" />
-            </div>
-
-            <div class="form-two-col">
-              <div class="form-row">
-                <label for="asset">Asset group</label>
-                <input id="asset" name="asset" value="thermal_network_zone_A" />
+            <div class="ov-right-col">
+              <div class="panel">
+                <h2>Service details</h2>
+                <dl class="status-list">
+                  <div><dt>Environment</dt><dd id="env-value">—</dd></div>
+                  <div><dt>Email mode</dt><dd id="dry-value">—</dd></div>
+                  <div><dt>SMTP</dt><dd id="smtp-value">—</dd></div>
+                  <div><dt>Last checked</dt><dd id="health-time">—</dd></div>
+                </dl>
+                <p id="smtp-hint" class="hint" style="margin-top:12px;"></p>
+                <button id="check-health" class="btn btn-secondary btn-sm" style="margin-top:12px;">Refresh status</button>
               </div>
-              <div class="form-row">
-                <label for="flex">Estimated flexibility (kWh)</label>
-                <input id="flex" name="flex" type="number" step="0.1" min="0" value="42.5" />
+
+              <div class="panel" style="margin-top:12px;">
+                <h2>System log</h2>
+                <ul id="event-list" class="event-list"></ul>
+                <button id="refresh-events" class="btn btn-secondary btn-sm" style="margin-top:10px;">Refresh log</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 2. Send ──────────────────────────────────────────────────────── -->
+        <section id="section-send" class="section" style="display:none;">
+          <header class="section-header">
+            <div>
+              <h1>Send notification</h1>
+              <p class="section-sub">Choose a template and recipients, then send the FM notification.</p>
+            </div>
+          </header>
+
+          <div class="send-simple-layout">
+
+            <!-- Main column -->
+            <div>
+              <div class="panel">
+                <h2>Email template</h2>
+                <p class="muted" style="margin-bottom:14px;">Select a saved template. The subject and body will be taken from it.</p>
+                <div class="form-row" style="margin-top:0;">
+                  <label for="template-select">Template</label>
+                  <select id="template-select">
+                    <option value="">— Select a template —</option>
+                  </select>
+                </div>
+                <p id="template-select-hint" class="hint" style="margin-top:8px;"></p>
+              </div>
+
+              <div class="panel" style="margin-top:12px;">
+                <h2>Recipient</h2>
+                <div class="form-row" style="margin-top:0;">
+                  <label for="test-email">Individual email address <span class="label-opt">(optional)</span></label>
+                  <input id="test-email" name="test-email" type="email" placeholder="pilot-demo@example.com" />
+                </div>
+                <div class="form-row form-row-check">
+                  <label>
+                    <input id="use-karno-list" name="use-karno-list" type="checkbox" />
+                    Send to Karno recipient list (overrides individual address)
+                  </label>
+                </div>
+                <div id="recipient-list-preview" style="display:none; margin-top:12px;">
+                  <p class="muted" style="margin-bottom:6px; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;">Recipients in list</p>
+                  <div id="recipient-list-addresses" style="max-height:160px; overflow-y:auto; border:1px solid var(--line); border-radius:var(--radius); padding:10px 12px; background:var(--bg); font-size:0.84rem; line-height:1.8;"></div>
+                </div>
+              </div>
+
+              <div class="actions" style="margin-top:16px;">
+                <button type="button" id="send-notification-btn" class="btn btn-primary">Send notification</button>
+              </div>
+
+              <div id="send-result" class="hint" style="margin-top:12px;"></div>
+            </div>
+
+            <!-- Preview column -->
+            <div class="panel send-preview-panel">
+              <h2>Template preview</h2>
+              <p id="send-template-none" class="muted" style="font-size:0.85rem; padding:40px 0; text-align:center;">
+                Select a template to see a preview of the email.
+              </p>
+              <div id="send-template-info" style="display:none;">
+                <p class="send-tpl-name" id="send-tpl-name-display" style="margin:0 0 12px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);"></p>
+                <div style="border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden;">
+                  <!-- Email header bar -->
+                  <div style="background:var(--bg); padding:12px 16px; border-bottom:1px solid var(--line);">
+                    <p class="send-preview-subject" id="send-tpl-subject-display"></p>
+                    <p class="send-preview-meta">From: BlueBird FM Notification Service</p>
+                  </div>
+                  <!-- Email body -->
+                  <div id="send-preview-box" class="send-preview-box"></div>
+                </div>
               </div>
             </div>
 
+          </div>
+        </section>
+
+        <!-- ── 3. Recipients ─────────────────────────────────────────────────── -->
+        <section id="section-recipients" class="section" style="display:none;">
+          <header class="section-header">
+            <div>
+              <h1>Recipients</h1>
+              <p class="section-sub">Upload and manage multiple recipient lists. Select which one is active for sending.</p>
+            </div>
+          </header>
+
+          <!-- Saved lists table -->
+          <div class="panel" style="margin-bottom:16px;">
+            <h2>Saved lists</h2>
+            <p id="lists-empty" class="muted">No lists uploaded yet.</p>
+            <div class="table-wrap" id="lists-table-wrap" style="display:none;">
+              <table class="history-table" id="lists-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Recipients</th>
+                    <th>Uploaded</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="lists-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Upload new list -->
+          <div class="panel">
+            <h2>Upload a new list</h2>
+            <p class="muted" style="margin-bottom:16px;">
+              Upload a CSV with an <strong>email</strong> column. The new list is saved alongside the others — existing lists are not replaced.
+            </p>
+            <div class="form-two-col" style="margin-top:0;">
+              <div class="form-row" style="margin-top:0;">
+                <label for="list-name">List name <span class="label-opt">(optional)</span></label>
+                <input id="list-name" type="text" placeholder="E.g. Karno residents phase 1" />
+              </div>
+              <div class="form-row" style="margin-top:0;">
+                <label for="list-file">CSV file <span class="label-opt">(required column: email)</span></label>
+                <input id="list-file" type="file" accept=".csv,text/csv" />
+              </div>
+            </div>
+            <div id="list-result" class="hint" style="margin-top:10px;"></div>
             <div class="actions">
-              <button type="button" id="load-sample" class="btn btn-secondary">Load sample</button>
-              <button type="submit" class="btn btn-primary">Send simulation</button>
+              <button id="refresh-list-stats" class="btn btn-secondary">Refresh</button>
+              <button id="upload-list" class="btn btn-primary">Upload list</button>
             </div>
-          </form>
-        </article>
+          </div>
 
-        <article class="card timeline-card">
-          <h2>Latest events</h2>
-          <p class="muted">Simple timeline to explain what is happening.</p>
-          <ul id="event-list" class="event-list"></ul>
-          <button id="refresh-events" class="btn btn-secondary">Refresh events</button>
-        </article>
-      </section>
+          <!-- Hidden legacy elements kept for JS backwards-compat -->
+          <span id="list-exists" style="display:none;"></span>
+          <span id="list-count" style="display:none;"></span>
+          <span id="list-updated" style="display:none;"></span>
+          <button id="delete-list" style="display:none;"></button>
+        </section>
 
-      <section class="card result-card">
-        <h2>API response</h2>
-        <pre id="response-box">No submissions yet.</pre>
-      </section>
-    </main>
+        <!-- ── 4. Email templates ─────────────────────────────────────────────── -->
+        <section id="section-templates" class="section" style="display:none;">
+          <header class="section-header">
+            <div>
+              <h1>Email templates</h1>
+              <p class="section-sub">Create and manage reusable HTML email templates for FM notifications.</p>
+            </div>
+            <button id="new-template-btn" class="btn btn-primary">+ New template</button>
+          </header>
 
+          <div class="templates-layout">
+            <div class="templates-sidebar">
+              <ul id="template-list" class="template-list">
+                <li class="template-list-empty">No templates yet.</li>
+              </ul>
+            </div>
+
+            <div class="templates-editor">
+              <div id="template-editor-empty" class="template-empty-state">
+                Select a template from the list or create a new one.
+              </div>
+
+              <div id="template-editor-form" style="display:none;">
+                <div class="panel" style="padding-bottom:4px;">
+                  <div class="form-row" style="margin-top:0;">
+                    <label for="tpl-name">Template name</label>
+                    <input id="tpl-name" type="text" placeholder="E.g. Scheduled charge notice" />
+                  </div>
+                  <div class="form-row">
+                    <label for="tpl-subject">Email subject</label>
+                    <input id="tpl-subject" type="text" placeholder="E.g. FM Recommendation – Scheduled charge" />
+                  </div>
+                  <div class="form-row">
+                    <label>Content</label>
+                    <div id="quill-editor"></div>
+                  </div>
+                  <div id="template-result" class="hint" style="margin-top:10px;"></div>
+                  <div class="actions">
+                    <button id="delete-template-btn" class="btn btn-danger">Delete</button>
+                    <button id="duplicate-template-btn" class="btn btn-secondary">Duplicate</button>
+                    <button id="preview-template-btn" class="btn btn-secondary">Preview</button>
+                    <button id="save-template-btn" class="btn btn-primary">Save template</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 5. Send history ───────────────────────────────────────────────── -->
+        <section id="section-history" class="section" style="display:none;">
+          <header class="section-header">
+            <div>
+              <h1>Send history</h1>
+              <p class="section-sub">Log of recent sends. Email addresses are not stored.</p>
+            </div>
+            <button id="refresh-history-btn" class="btn btn-secondary">Refresh</button>
+          </header>
+
+          <div class="history-filters" role="group" aria-label="Filter by status">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="sent">Sent</button>
+            <button class="filter-btn" data-filter="dry_run">Simulated</button>
+            <button class="filter-btn" data-filter="failed">Failed</button>
+          </div>
+
+          <p class="empty-state" id="history-empty">No sends recorded yet.</p>
+          <div class="table-wrap">
+            <table class="history-table" id="history-table" style="display:none;">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Subject</th>
+                  <th>Recipients</th>
+                  <th>Severity</th>
+                  <th>Template</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div><!-- .main -->
+    </div><!-- .app-shell -->
+
+    <!-- ── Preview modal ──────────────────────────────────────────────────────── -->
+    <dialog id="preview-modal">
+      <div class="modal-header">
+        <span id="preview-subject" class="modal-subject"></span>
+        <button id="close-preview-btn" class="btn btn-secondary btn-sm">Close</button>
+      </div>
+      <div id="preview-body" class="preview-body"></div>
+    </dialog>
+
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

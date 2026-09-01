@@ -19,7 +19,12 @@ const fmOutputSchema = z.object({
   valid_to_utc: z.string().datetime({ offset: true }),
   constraints_summary: z.string().min(5),
   requested_by: z.string().min(1),
+  // Send to a single address for technical testing (address is never logged).
   test_recipient_email: z.string().email().optional(),
+  // When true, the notification is sent to the stored Karno recipient list.
+  use_karno_list: z.boolean().optional(),
+  // ID of a stored email template to use as subject and body.
+  template_id: z.string().uuid().optional(),
   metadata: z.object({
     asset_group: z.string().min(1),
     estimated_flex_kwh: z.number().nonnegative()

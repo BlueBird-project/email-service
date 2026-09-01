@@ -5,12 +5,28 @@ const { config } = require('./config');
 const logger = require('./logger');
 const { validateFmOutput } = require('./validation');
 const { sendFmNotification } = require('./emailService');
+const listRoutes = require('./listRoutes');
+const templateRoutes = require('./templateRoutes');
+const { getHistory } = require('./history');
 
 const app = express();
 const logsPath = path.join(process.cwd(), 'logs', 'app.log');
 
 app.use(express.json({ limit: '256kb' }));
 app.use(express.static(path.join(process.cwd(), 'public')));
+
+// Karno recipient list management routes
+app.use('/karno/list', listRoutes);
+
+// Email template CRUD routes
+app.use('/templates', templateRoutes);
+
+// Send history
+app.get('/history', (req, res) => {
+  const parsed = Number.parseInt(req.query.limit, 10);
+  const limit = Number.isNaN(parsed) ? 50 : Math.min(Math.max(parsed, 1), 200);
+  res.status(200).json({ status: 'ok', history: getHistory(limit) });
+});
 
 function getRecentEvents(limit = 10) {
   if (!fs.existsSync(logsPath)) {
