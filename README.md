@@ -1,6 +1,6 @@
-# Karno FM Email PoC
+# BlueBird FM Email PoC
 
-Simple PoC for BlueBird/Karno to simulate a Flexibility Manager (FM) output and validate the email notification flow.
+Simple PoC for BlueBird to simulate a Flexibility Manager (FM) output and validate the email notification flow.
 
 ## What this app does
 
@@ -14,13 +14,21 @@ Simple PoC for BlueBird/Karno to simulate a Flexibility Manager (FM) output and 
 ## Requirements
 
 - Node.js 18+ (for local run)
-- Docker + Docker Compose (for container run)
+- Docker Desktop + Docker Compose (for container run)
 
-## Local setup
+## Quick start (Windows)
 
 1. Copy `.env.example` to `.env`.
-2. Update SMTP values and recipients.
-3. Keep `EMAIL_DRY_RUN=true` to test without real email delivery.
+2. Set `EMAIL_DRY_RUN=true` in `.env` to test without a real SMTP server.
+3. Make sure Docker Desktop is running.
+4. Double-click `start-docker.bat`.
+
+The script will build the image, start the container, and open the dashboard in your browser.
+
+## Local setup (without Docker)
+
+1. Copy `.env.example` to `.env`.
+2. Update SMTP values and recipients, or set `EMAIL_DRY_RUN=true` to skip real email delivery.
 
 Install and run:
 
@@ -29,18 +37,20 @@ npm install
 npm start
 ```
 
-The app runs on `http://localhost:3000` by default.
+The app runs on `http://127.0.0.1:3050` by default.
 
 ## Docker setup
 
-1. Copy `.env.example` to `.env` and adjust values.
+1. Copy `.env.example` to `.env` and adjust values (or keep `EMAIL_DRY_RUN=true` for testing).
 2. Build and start the container:
 
 ```bash
 docker compose up --build
 ```
 
-3. Open `http://localhost:3000`.
+3. Open `http://127.0.0.1:3050` in your browser.
+
+> **Note:** The container maps external port **3050** to internal port 3000. This avoids conflicts with other services that may use port 3000. You can change the external port in `docker-compose.yml` under `ports`.
 
 Stop the stack:
 
@@ -50,7 +60,7 @@ docker compose down
 
 ## Demo dashboard
 
-Open `http://localhost:3000` in a browser.
+Open `http://127.0.0.1:3050` in a browser.
 
 The dashboard allows you to:
 
@@ -60,20 +70,6 @@ The dashboard allows you to:
 - View API responses.
 - Display recent events from logs.
 
-## Temporary inbox demo flow (for Edu)
-
-1. Open the dashboard and click `Check status`.
-2. Confirm `Email mode` is `Real SMTP`.
-3. Confirm `SMTP readiness` is `Ready`.
-4. Open any temporary inbox provider and copy a disposable email address.
-5. Paste that address in `Test recipient email (optional)`.
-6. Click `Send simulation`.
-7. Confirm the API response shows:
-  - `"sent": true`
-  - `"to": "<temporary-email>"`
-8. Refresh the temporary inbox page and show the received recommendation email.
-
-If `SMTP readiness` is `Not ready`, update `.env` with real SMTP values and restart the app.
 
 ## API endpoints
 
@@ -87,7 +83,7 @@ Returns recent events from `logs/app.log`.
 
 ### POST /fm-output
 
-Receives simulated FM output for Karno.
+Receives simulated FM output for BlueBird.
 
 Optional field:
 
@@ -98,7 +94,7 @@ Sample payload is available in `sample-payload.json`.
 Example:
 
 ```bash
-curl -X POST http://localhost:3000/fm-output \
+curl -X POST http://127.0.0.1:3050/fm-output \
   -H "Content-Type: application/json" \
   --data @sample-payload.json
 ```
@@ -108,6 +104,21 @@ curl -X POST http://localhost:3000/fm-output \
 - `202 Accepted`: valid payload and notification flow executed.
 - `400 Bad Request`: invalid payload.
 - `502 Bad Gateway`: valid payload but SMTP send failed.
+
+## Environment variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `PORT` | Internal server port | `3000` |
+| `APP_ENV` | Environment name | `development` |
+| `EMAIL_DRY_RUN` | `true` to simulate emails without SMTP | `false` |
+| `SMTP_HOST` | SMTP server hostname | — |
+| `SMTP_PORT` | SMTP server port | `587` |
+| `SMTP_SECURE` | Use TLS | `false` |
+| `SMTP_USER` | SMTP username | — |
+| `SMTP_PASS` | SMTP password | — |
+| `SMTP_FROM` | Sender email address | — |
+| `SMTP_TO` | Default recipient email | — |
 
 ## Next evolution ideas
 

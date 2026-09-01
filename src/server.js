@@ -52,7 +52,7 @@ function getRecentEvents(limit = 10) {
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    service: 'karno-fm-email-poc',
+    service: 'bluebird-fm-email-poc',
     env: config.appEnv,
     emailDryRun: config.emailDryRun,
     smtpReady: config.smtpReady,
