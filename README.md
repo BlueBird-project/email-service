@@ -1,103 +1,244 @@
-# BlueBird FM Email PoC
+# BlueBird FM Email Service
 
-Simple PoC for BlueBird to simulate a Flexibility Manager (FM) output and validate the email notification flow.
+A modern web dashboard for managing and dispatching FM (Flexibility Manager) notifications to pilots. Built for the Karno pilot project, featuring multi-template support, recipient list management, and a streamlined operator interface.
 
-## What this app does
+## Features
 
-- Exposes `POST /fm-output` to receive a simulated FM output.
-- Validates the incoming payload.
-- Builds a structured email message.
-- Sends email through SMTP, or simulates delivery when `EMAIL_DRY_RUN=true`.
-- Stores event logs in `logs/app.log`.
-- Provides a browser dashboard for non-technical demos.
+### 📊 Dashboard
+- **Overview** — Real-time service status, SMTP readiness, recipient counts, recent send history
+- **Send** — Simplified interface to choose a template and send to individual email or recipient list; live preview of how the email will look
+- **Recipients** — Upload multiple CSV recipient lists and toggle between them without re-uploading
+- **Email Templates** — Visual HTML editor to create and manage reusable notification templates
+- **Send History** — Expandable rows showing exactly who received each notification, with template preview
 
-## Requirements
+### 🎨 Modern UI
+- Clean sidebar navigation with blue accent color scheme
+- Responsive design (desktop and mobile)
+- Sticky email preview panel (stays visible while scrolling)
+- Dark terminal-style API response viewer
+- Inline validation and user feedback
 
-- Node.js 18+ (for local run)
-- Docker Desktop + Docker Compose (for container run)
+### 📋 Recipient List Management
+- Upload multiple CSV files with an `email` column
+- Name each list (auto-named from filename if not provided)
+- One list is always "active" — that's the one used for sending
+- Easily switch active lists or delete old ones
+- List addresses are shown in the Send section before you click Send
 
-## Quick start (Windows)
+### 🧩 Email Templates
+- Create HTML templates with a visual editor (Quill.js)
+- Support for formatting: headings, bold, italic, colors, lists, links
+- Each template has a name and email subject line
+- Duplicate any template to quickly create variants
+- Live preview in Send section shows how the email will look
+- Template body is rendered in-browser when viewing send history
 
-1. Copy `.env.example` to `.env`.
-2. Set `EMAIL_DRY_RUN=true` in `.env` to test without a real SMTP server.
-3. Make sure Docker Desktop is running.
-4. Double-click `start-docker.bat`.
+### 📤 Sending
+- Choose a template and recipient (individual email or active list)
+- Preview the full email mockup before sending
+- See recipient list addresses inline
+- Dry-run mode available (test without real SMTP)
+- Inline success/error messages with recipient counts
 
-The script will build the image, start the container, and open the dashboard in your browser.
+### 📊 Send History
+- Expandable table rows — click to see full details
+- Shows template name, recipient(s), status, and send date
+- Expandable rows display the complete email template body as it was sent
+- Dry-run indicator for test sends
+- Filter by status (all, sent, dry_run, error)
 
-## Local setup (without Docker)
+## Technical Overview
 
-1. Copy `.env.example` to `.env`.
-2. Update SMTP values and recipients, or set `EMAIL_DRY_RUN=true` to skip real email delivery.
+### Backend
+- **Node.js + Express** — REST API for all operations
+- **Multer** — Safe in-memory CSV file processing (no disk writes)
+- **Nodemailer** — SMTP integration with support for dry-run mode
+- **Zod** — Payload validation (ensures FM metadata structure)
+- **JSON-based storage** — Recipient lists and templates persisted to `data/` directory
 
-Install and run:
+### Frontend
+- **Vanilla JavaScript** — No framework dependency for simplicity
+- **Responsive CSS Grid** — Layout adapts to screen size
+- **Quill.js** — Rich HTML editor for templates
+- **File upload handling** — CSV parsing and validation in-browser feedback
+
+### Data Privacy
+- Email addresses are stored server-side only (for sending)
+- They are NOT included in API logs or responses (except when viewing history)
+- CSV files are never written to disk — processed in memory only
+- All data persists in `data/` (ignored by `.gitignore`)
+
+## API Endpoints
+
+### Health & Status
+- `GET /health` — Service status, SMTP readiness, environment
+
+### Send Notifications
+- `POST /fm-output` — Send an FM notification
+
+### Recipient Lists
+- `GET /karno/list/stats` — Active list statistics
+- `GET /karno/list/emails` — Email addresses in active list (operator-visible)
+- `GET /karno/list/all` — All saved lists with active flag
+- `POST /karno/list/add` — Upload a new recipient list (doesn't replace others)
+- `PUT /karno/list/:id/activate` — Set a list as active
+- `DELETE /karno/list/:id` — Delete a specific list
+
+### Email Templates
+- `GET /templates` — List all templates
+- `GET /templates/:id` — Get template details (name, subject, HTML body)
+- `POST /templates` — Create a new template
+- `PUT /templates/:id` — Update a template
+- `DELETE /templates/:id` — Delete a template
+
+### Send History
+- `GET /history` — Retrieve recent sends (with recipient info, template details, etc.)
+
+## Quick Start
+
+### Docker (recommended)
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/BlueBird-project/email-service.git
+cd email-service
+
+# 2. Create .env from template
+cp .env.example .env
+
+# 3. Edit .env with your SMTP settings (or keep EMAIL_DRY_RUN=true for testing)
+
+# 4. Start the service
+docker compose up --build -d
+```
+
+Open **http://localhost:3050** in your browser.
+
+### Local Node.js Setup
+
+```bash
+# 1. Install dependencies
 npm install
+
+# 2. Copy and configure .env
+cp .env.example .env
+# Edit SMTP values or set EMAIL_DRY_RUN=true
+
+# 3. Start the server
 npm start
 ```
 
-The app runs on `http://127.0.0.1:3050` by default.
+The app runs on **http://localhost:3050** (for backwards compatibility with Docker).
 
-## Docker setup
+## Environment Configuration
 
-1. Copy `.env.example` to `.env` and adjust values (or keep `EMAIL_DRY_RUN=true` for testing).
-2. Build and start the container:
+Create a `.env` file from `.env.example`:
 
-```bash
-docker compose up --build
+```env
+PORT=3000
+APP_ENV=development
+EMAIL_DRY_RUN=false
+
+# SMTP Configuration
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-user
+SMTP_PASS=your-password
+SMTP_FROM=bluebird@example.com
+SMTP_TO=team@example.com
 ```
 
-3. Open `http://127.0.0.1:3050` in your browser.
+**Key variables:**
+- `EMAIL_DRY_RUN=true` — Test mode (no real email sent, simulated delivery)
+- `SMTP_*` — Your email server credentials
+- `SMTP_FROM` — Sender email address
+- `SMTP_TO` — Default recipient (overridable per send)
 
-> **Note:** The container maps external port **3050** to internal port 3000. This avoids conflicts with other services that may use port 3000. You can change the external port in `docker-compose.yml` under `ports`.
+## Project Structure
 
-Stop the stack:
-
-```bash
-docker compose down
+```
+.
+├── src/
+│   ├── server.js              # Express app entry point
+│   ├── emailService.js        # Email sending logic + payload building
+│   ├── validation.js          # Zod schemas for FM payload
+│   ├── listRoutes.js          # Recipient list endpoints
+│   ├── recipientList.js       # Multi-list management logic
+│   ├── templateRoutes.js      # Template CRUD endpoints
+│   ├── history.js             # Send history storage
+│   ├── config.js              # Environment configuration
+│   ├── logger.js              # Application logging
+│   └── ...
+├── public/
+│   ├── index.html             # Dashboard UI
+│   ├── app.js                 # Frontend logic & API calls
+│   ├── styles.css             # Blue-themed stylesheet
+│   └── ...
+├── docker-compose.yml         # Multi-container orchestration
+├── Dockerfile                 # Container image definition
+├── package.json               # Node.js dependencies
+├── .env.example               # Environment template
+└── README.md                  # This file
 ```
 
-## Demo dashboard
+## Workflow Example
 
-Open `http://127.0.0.1:3050` in a browser.
+1. **Setup recipients** → Go to Recipients tab, upload a CSV file with emails
+2. **Create a template** → Go to Email Templates, click "+ New template", add subject and HTML body
+3. **Send notification** → Go to Send, select template, choose recipient (list or individual), review preview, click "Send notification"
+4. **Check history** → Go to Send History, click any row to expand and see full email + recipient list
+5. **Switch lists** → In Recipients, click "Use this list" to activate a different recipient list
+6. **Modify template** → In Email Templates, select a template and edit, then save
 
-The dashboard allows you to:
+## Notes for Deployment
 
-- Check service status and email mode.
-- Submit a simulated FM recommendation.
-- Optionally set a one-off test recipient email per submission.
-- View API responses.
-- Display recent events from logs.
+- **Port mapping** — Docker exposes port 3050 (change in `docker-compose.yml` if needed)
+- **Data persistence** — `logs/` and `data/` directories are mounted as Docker volumes
+- **No restart policy** — Set to `unless-stopped` (survives docker daemon restart)
+- **CSV file size limit** — 1 MB per file (configured in multer)
+- **Email character limit** — Templates can be up to 64 KB (HTTP body limit)
 
+## Development
 
-## API endpoints
-
-### GET /health
-
-Basic health endpoint.
-
-### GET /events
-
-Returns recent events from `logs/app.log`.
-
-### POST /fm-output
-
-Receives simulated FM output for BlueBird.
-
-Optional field:
-
-- `test_recipient_email`: if provided, overrides the default `SMTP_TO` recipient for that single request.
-
-Sample payload is available in `sample-payload.json`.
-
-Example:
-
+### Install dependencies
 ```bash
-curl -X POST http://127.0.0.1:3050/fm-output \
-  -H "Content-Type: application/json" \
-  --data @sample-payload.json
+npm install
 ```
+
+### Run locally
+```bash
+npm start
+```
+
+### Build Docker image
+```bash
+docker compose build
+```
+
+### View logs
+```bash
+docker logs -f karno-fm-email-poc
+```
+
+## Troubleshooting
+
+**Q: I can't see the recipient list after uploading**  
+→ Click "Refresh" or go to another section and back. The list should appear in the Recipients table.
+
+**Q: The email template isn't showing in Send preview**  
+→ Make sure you saved the template. Refresh the page and try selecting it again.
+
+**Q: Sending fails with "Invalid FM output payload"**  
+→ Check that the request includes all required FM fields (severity, title, description, etc.). The backend validates against a Zod schema.
+
+**Q: Email isn't being sent but no error shown**  
+→ Check if `EMAIL_DRY_RUN=true` in your `.env`. If yes, it's simulating delivery. For real send, set it to `false` and ensure SMTP is configured.
+
+## License
+
+Part of the BlueBird project.
+
 
 ## Expected responses
 
